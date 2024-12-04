@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); 
 const axios = require('axios');
 const path = require('path');
 
@@ -14,20 +14,19 @@ app.get('/api/pokemons/:poke_name', async (req, res) => {
 
   try {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokeName.toLowerCase()}`);
+    
+    //extrai habilidades e ordena
+    const abilities = response.data.abilities.map((ability) => ability.ability.name).sort();
+    
+    //pega a url da imagem do pokémon
+    const imageUrl = response.data.sprites.front_default;
 
-    console.log(response.data);
-
-    const abilities = response.data.abilities
-      .map((ability) => ability.ability.name)
-      .sort();
-
-
-    res.json({ pokemon: pokeName, abilities });
+    res.json({ pokemon: pokeName, abilities, imageUrl });
   } catch (error) {
     if (error.response && error.response.status === 404) {
       res.status(404).json({ error: "Pokémon não encontrado!" });
     } else {
-      res.status(500).json({ error: "Falha ao buscar o Pokémon." });
+      res.status(500).json({ error: "Falha ao buscar informações do Pokémon." });
     }
   }
 });
